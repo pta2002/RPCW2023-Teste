@@ -1,0 +1,23 @@
+1.1 - Processamento de dados:
+As datas foram convertidas para o formato extended JSON utilizando um scripy python process.py
+
+Importado com
+
+docker-compose exec -T mongodb mongoimport --jsonArray -d scienceJobs -c contracts <processado.json
+
+1.2 - Queries
+1: db.contracts.countDocuments() -> 17943
+2: db.contracts.countDocuments({"NomeInstituicao": "Universidade do Minho"}) -> 166
+3: db.contracts.distinct("AreaCNAEF")
+4: db.contracts.aggregate([{$group:{_id: {$year: "$DataInicioContrato"}, count: {$sum: 1}}}])
+[
+  { _id: 2019, count: 5833 },
+  { _id: 2018, count: 2042 },
+  { _id: 2017, count: 1310 },
+  { _id: 2021, count: 2465 },
+  { _id: 2020, count: 6293 }
+]
+5: db.contracts.aggregate([{$group:{_id: "$NomeInstituicao", count: {$sum: 1}}}])
+
+1.3:
+Para o id, foi utilizado o _id autogerado do MongoDB. Isto permite manter o ID como um campo único nas inserções.
