@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  h1.font-bold.text-2xl.mb-2 Contratos
+
+  table.w-full
+    thead
+      tr
+        th.px-4.py-2.border.border-gray-400.bg-gray-100 ID
+        th.px-4.py-2.border.border-gray-400.bg-gray-100 Início do Contrato
+        th.px-4.py-2.border.border-gray-400.bg-gray-100 Fim do Contrato
+        th.px-4.py-2.border.border-gray-400.bg-gray-100 Nome da Instituição
+        th.px-4.py-2.border.border-gray-400.bg-gray-100 Área de investigação
+        th.px-4.py-2.border.border-gray-400.bg-gray-100 Ações
+    tbody
+      each contract in contracts
+        tr
+          td.px-4.py-2.border.border-gray-400
+            a.text-blue-400.underline(href="/" + contract._id)= contract._id
+          td.px-4.py-2.border.border-gray-400= new Date(contract.DataInicioContrato).toISOString().substr(0, 10)
+          td.px-4.py-2.border.border-gray-400
+            if contract.DataFimContrato
+              .font-normal= new Date(contract.DataFimContrato).toISOString().substr(0, 10)
+            else
+              .font-normal Contrato sem data de fim
+          td.px-4.py-2.border.border-gray-400
+            a.text-blue-400.underline(href="/inst/" + contract.NIPCInstituicao)= contract.NomeInstituicao
+          contract.NomeInstituicao
+          td.px-4.py-2.border.border-gray-400= contract.AreaCNAEF
+          td.px-4.py-2.border.border-gray-400
+            a.text-red-400.underline(href="/" + contract._id + "/delete") Apagar

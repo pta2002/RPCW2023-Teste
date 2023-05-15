@@ -7,7 +7,7 @@ router.get('/contracts', async function(req, res) {
   if (req.query.year) {
     contracts = await Contract.getByYear(Number.parseInt(req.query.year))
   } else if (req.query.inst) {
-    contracts = await Contract.getByInst(req.query.inst)
+    contracts = await Contract.getByInst(Number.parseInt(req.query.inst))
   } else {
     contracts = await Contract.list()
   }
@@ -29,9 +29,17 @@ router.get('/contracts/institutions', async function(req, res) {
   res.send(contrato)
 });
 
+router.get('/contracts/institutions/:nipc', async function(req, res) {
+  let nomes = await Contract.getInstitutionNames(Number.parseInt(req.params.nipc))
+  res.send(nomes)
+});
+
 router.get('/contracts/:id', async function(req, res) {
   let contrato = await Contract.getById(req.params.id)
-  res.send(contrato)
+  if (contrato)
+    res.send(contrato)
+  else
+    res.status(404).send({ error: "Contract not found" })
 });
 
 router.delete('/contracts/:id', async function(req, res) {

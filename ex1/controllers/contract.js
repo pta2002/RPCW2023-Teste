@@ -18,7 +18,7 @@ module.exports.getByYear = async (year) => {
 
 module.exports.getByInst = async (inst) => {
   return await Contract.find({
-    NomeInstituicao: inst
+    NIPCInstituicao: inst
   })
 }
 
@@ -28,6 +28,15 @@ module.exports.getCourses = async () => {
 
 module.exports.getInstitutions = async () => {
   return await Contract.distinct("NomeInstituicao")
+}
+
+module.exports.getInstitutionNames = async (nipc) => {
+  let nomes = await Contract.aggregate([
+    { $match: { NIPCInstituicao: nipc } },
+    { $group: { _id: "$NomeInstituicao" } }
+  ])
+
+  return nomes.map(n => n._id)
 }
 
 module.exports.add = async (contract) => {

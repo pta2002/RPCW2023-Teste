@@ -1,0 +1,59 @@
+extends layout
+
+block content
+  h1.text-2xl.font-bold Contrato #{contract._id}
+
+  .grid.grid-cols-2.w-full
+    .font-bold.text-slate-800 Nome da Instituição 
+    a.text-blue-400.underline(href="/inst/" + contract.NIPCInstituicao)= contract.NomeInstituicao
+    .font-bold.text-slate-800 NIPC da Instituição
+    .font-normal= contract.NIPCInstituicao
+    .font-bold.text-slate-800 Titular do Contrato
+    .font-normal= contract.NomeTitularContrato
+    .font-bold.text-slate-800 Ciência ID
+    .font-normal= contract.CienciaID
+    .font-bold.text-slate-800 Ciência Vitae
+    .font-normal= contract.CienciaVitae
+    .font-bold.text-slate-800 Carreira RPN
+    .font-normal= contract.Carreira_RPN
+    .font-bold.text-slate-800 Categoria RPN
+    .font-normal= contract.Categoria_RPN
+    .font-bold.text-slate-800 Vínculo RPN
+    .font-normal= contract.Vinculo_RPN
+    .font-bold.text-slate-800 Regime de Prestação de Serviço
+    .font-normal= contract.RegimePrestacaoServico
+    .font-bold.text-slate-800 Data de Início do Contrato
+    .font-normal= new Date(contract.DataInicioContrato).toISOString().substr(0, 10)
+    .font-bold.text-slate-800 Data de Fim do Contrato
+    if contract.DataFimContrato
+      .font-normal= new Date(contract.DataFimContrato).toISOString().substr(0, 10)
+    else
+      .font-normal Contrato sem data de fim
+    .font-bold.text-slate-800 ETI Remunerado
+    .font-normal= contract.ETIremunerado
+    .font-bold.text-slate-800 Procedimento de Vinculação
+    .font-normal= contract.ProcedimentoVinculacao
+    .font-bold.text-slate-800 Áreas de Investigação
+    .font-normal= contract.AreasInvestigacao
+    .font-bold.text-slate-800 Nível de Formação
+    .font-normal= contract.NivelFormação
+    .font-bold.text-slate-800 Instituição de Ensino
+    .font-normal= contract.InstituicaoEnsino
+    .font-bold.text-slate-800 País da Instituição
+    .font-normal= contract.PaisInstituição
+    .font-bold.text-slate-800 Ano do Diploma
+    .font-normal= contract.AnoDiploma
+    .font-bold.text-slate-800 Curso
+    .font-normal= contract.Curso
+    .font-bold.text-slate-800 Área CNAEF
+    .font-normal= contract.AreaCNAEF
+    .font-bold.text-slate-800 Área FORD
+    .font-normal= contract.AreaFORD
+    .font-bold.text-slate-800 Provas de Agregação
+    .font-normal= contract.ProvasAgregacao
+    .font-bold.text-slate-800 Título Especialista
+    .font-normal= contract.TituloEspecialista
+    .font-bold.text-slate-800 Provas de Coordenação
+    .font-normal= contract.ProvasCoordenacao
+    .font-bold.text-slate-800 Provas de Aptidão
+    .font-normal= contract.ProvasAptidao

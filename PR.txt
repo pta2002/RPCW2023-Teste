@@ -1,13 +1,30 @@
+# Persistência de dados
+A base de dados utilizada foi o MongoDB. Para isolamento e facilidade de utilização, esta está a ser corrida num _container_ Docker, gerido pelo `docker-compose`.
+
+Para executar a base de dados, basta correr o comando `docker-compose up -d` na raiz do projeto. Para eliminar a base de dados, basta correr o comando `docker-compose down`.
+
+Os dados estão contidos na base de dados denomeada `scienceJobs`, na coleção `contracts`.
+
+As duas aplicações foram geradas utilizando o `express-generate`, sendo que a primeira foi gerada com a opção `--no-view` (pois apenas serve uma API) e a segunda foi gerada com a opção `--pug`, para utilizar Pug como _engine_ de views.
+
+Para executar cada uma das aplicações, apenas é necessário entrar em cada uma das diretorias (`ex1` e `ex2`) e executar `npm start`.
+
 1.1 - Processamento de dados:
-As datas foram convertidas para o formato extended JSON utilizando um scripy python process.py
+As datas foram convertidas para o formato extended JSON utilizando um script python process.py. O processamento principal feito por este script encontra-se na conversão de datas do formato original para um formato compreensível pelo MongoDB como uma data.
 
-Importado com
+Esta conversão é feita convertendo a data num _timestamp_ em milisegundos, envolvido no JSON {$date: {$numberLong: "[milisegundos]"}}. Tanto as datas `DataFimContrato` e `DataInicioContrato` foram convertidas.
 
-docker-compose exec -T mongodb mongoimport --jsonArray -d scienceJobs -c contracts <processado.json
+Com esta conversão, é possível fazer queries sobre as datas muito mais eficientemente.
+
+O _script_ emite o ficheiro `processado.json`, que é importado com o comando `docker-compose exec -T mongodb mongoimport --jsonArray -d scienceJobs -c contracts <processado.json`.
+
+Podemos depois entrar na `mongosh` utilizando `docker-compose exec mongodb mongosh`, selecionando a base de dados com o comando `use scienceJobs` e vendo que os documentos foram importados corretamente fazendo `db.contracts.find()`.
 
 1.2 - Queries
 1: db.contracts.countDocuments() -> 17943
-2: db.contracts.countDocuments({"NomeInstituicao": "Universidade do Minho"}) -> 166
+2: Podemos pesquisar apenas por "Universidade do Minho": db.contracts.countDocuments({"NomeInstituicao": "Universidade do Minho"}) -> 166
+   Podemos alternativamente pesquisar pelo NIPC: db.contracts.countDocuments({"NIPC": 502011378}) -> 1104
+   A diferença deve-se a alguns contratos utilizarem um nome diferente da instituição, por exemplo "Universidade do Minho - Escola de Arquitetura".
 3: db.contracts.distinct("AreaCNAEF")
 4: db.contracts.aggregate([{$group:{_id: {$year: "$DataInicioContrato"}, count: {$sum: 1}}}])
 [
@@ -21,3 +38,10 @@ docker-compose exec -T mongodb mongoimport --jsonArray -d scienceJobs -c contrac
 
 1.3:
 Para o id, foi utilizado o _id autogerado do MongoDB. Isto permite manter o ID como um campo único nas inserções.
+
+Para a rota de query por instituição, foi utilizado o NIPC, para facilitar o exercício seguinte.
+
+2:
+Como algumas instituições (por exemplo, Universidade do Minho) têm várias instituições com o mesmo NIPC, foi acrescentada uma rota à API do exercício anterior (`/contracts/insitutions/:nipc`) que devolve uma lista de nomes utilizados por esta instituição. Esta lista é depois apresentada na página para cada instituição, quando são pedidos os contratos.
+
+Adicionalmente, foi acrescentada a opção de apagar um contrato (`/:id/delete`).
