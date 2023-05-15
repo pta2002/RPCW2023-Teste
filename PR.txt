@@ -1,7 +1,7 @@
 # Persistência de dados
 A base de dados utilizada foi o MongoDB. Para isolamento e facilidade de utilização, esta está a ser corrida num _container_ Docker, gerido pelo `docker-compose`.
 
-Para executar a base de dados, basta correr o comando `docker-compose up -d` na raiz do projeto. Para eliminar a base de dados, basta correr o comando `docker-compose down`.
+Para executar a base de dados, basta correr o comando `docker-compose up -d` na raiz do projeto. O processo do MongoDB pode ser parado com o comando `docker-compose stop`, e o container e volumes podem ser eliminados com o comando `docker-compose down -v`.
 
 Os dados estão contidos na base de dados denomeada `scienceJobs`, na coleção `contracts`.
 
