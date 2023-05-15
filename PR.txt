@@ -10,7 +10,7 @@ As duas aplicações foram geradas utilizando o `express-generate`, sendo que a 
 Para executar cada uma das aplicações, apenas é necessário entrar em cada uma das diretorias (`ex1` e `ex2`) e executar `npm start`.
 
 1.1 - Processamento de dados:
-As datas foram convertidas para o formato extended JSON utilizando um script python process.py. O processamento principal feito por este script encontra-se na conversão de datas do formato original para um formato compreensível pelo MongoDB como uma data.
+As datas foram convertidas para o formato extended JSON utilizando um script python process.py. O processamento principal feito por este script encontra-se na conversão de datas do formato original para um formato compreensível pelo MongoDB como uma data. O script também remove colunas vazias, de modo a não poluir a base de dados.
 
 Esta conversão é feita convertendo a data num _timestamp_ em milisegundos, envolvido no JSON {$date: {$numberLong: "[milisegundos]"}}. Tanto as datas `DataFimContrato` e `DataInicioContrato` foram convertidas.
 
@@ -22,19 +22,193 @@ Podemos depois entrar na `mongosh` utilizando `docker-compose exec mongodb mongo
 
 1.2 - Queries
 1: db.contracts.countDocuments() -> 17943
+
 2: Podemos pesquisar apenas por "Universidade do Minho": db.contracts.countDocuments({"NomeInstituicao": "Universidade do Minho"}) -> 166
-   Podemos alternativamente pesquisar pelo NIPC: db.contracts.countDocuments({"NIPC": 502011378}) -> 1104
-   A diferença deve-se a alguns contratos utilizarem um nome diferente da instituição, por exemplo "Universidade do Minho - Escola de Arquitetura".
+   No entanto, alguns contratos referem-se a uma escola específica da Universidade do Minho (por exemplo, "Universidade do Minho - Escola de Arquitetura"). Para os encontrar, podemos pesquisar pelo NIPC: db.contracts.countDocuments({"NIPC": 502011378}) -> 1104
+   Também é possível pesquisar utilizando uma expressão regular, que dá o mesmo resultado que utilizando o NIPC: db.contracts.countDocuments({NomeInstituicao: {$regex: /Universidade do Minho/}}) -> 1104
+
 3: db.contracts.distinct("AreaCNAEF")
-4: db.contracts.aggregate([{$group:{_id: {$year: "$DataInicioContrato"}, count: {$sum: 1}}}])
+Alguns resultados:
 [
-  { _id: 2019, count: 5833 },
-  { _id: 2018, count: 2042 },
-  { _id: 2017, count: 1310 },
-  { _id: 2021, count: 2465 },
-  { _id: 2020, count: 6293 }
+  'Agricultura sem definição precisa',
+  'Agricultura, silvicultura, pescas e ciências veterinárias sem definição precisa',
+  'Ambiente sem definição precisa',
+  'Ambientes naturais e vida selvagem',
+  'Aprendizagem de línguas',
+  'Arquitetura e construção sem definição precisa',
+  'Arquitetura e urbanismo',
+  'Artes e humanidades sem definição precisa',
+  'Artes sem definição precisa',
+  'Artesanato',
+  'Belas-artes',
+  'Biblioteconomia, arquivística e ciências da informação',
+  'Biologia',
+  'Bioquímica',
+  'Ciências biológicas e ciências afins sem definição precisa',
+  'Ciências da educação',
+  'Ciências da terra',
+  'Ciências dentárias',
+  'Ciências do ambiente',
+  'Ciências empresariais e administração sem definição precisa',
+  'Ciências empresariais, administração e direito sem definição precisa',
+  'Ciências farmacêuticas',
+  'Ciências físicas sem definição precisa',
+  'Ciências naturais, matemática e estatística sem definição precisa',
+  'Ciências políticas e cidadania',
+  'Ciências sociais e comportamentais sem definição precisa',
+  'Ciências sociais, jornalismo e informação sem definição precisa',
+  'Ciências veterinárias',
+  'Competências laborais',
+  'Construção civil e engenharia civil',
+  'Contabilidade e fiscalidade',
+  'Desenvolvimento e análise de software e aplicações informáticas',
+  'Design de moda, de interiores e industrial',
+  'Design e administração de bases de dados e de redes informáticas',
+  'Desporto',
+  'Direito',
+  'Economia',
+  'Eletricidade e energia',
+  'Eletrónica e automação',
+  'Enfermagem geral e enfermagem obstétrica',
+  'Engenharia e tecnologias afins sem definição precisa',
+  'Engenharia química e de processos',
+  'Engenharia, indústrias transformadoras e construção sem definição precisa',
+  'Estatística',
+  'Filosofia e ética',
+  'Finanças, banca e seguros',
+  'Formação de educadores de infância',
+  'Formação de professores de áreas disciplinares específicas',
+  'Formação de professores de áreas disciplinares não específicas',
+  'Física',
+  'Gestão e administração',
+  'História e arqueologia',
+  'Horticultura',
+  'Humanidades (exceto línguas) sem definição precisa',
+  'Indústrias alimentares',
+  'Indústrias extrativas',
+  'Informática na ótica do utilizador',
+  'Jornalismo e informação sem definição precisa',
+  'Jornalismo e reportagem',
+  'Literatura e linguística',
+  'Línguas sem definição precisa',
+  'Marketing e publicidade',
+  'Matemática',
+  'Matemática e estatística sem definição precisa',
+  'Materiais (vidro, papel, plástico e madeira)',
+  'Medicina',
+  'Medicina tradicional e complementar e terapia',
+  'Metalurgia e metalomecânica',
+  'Música e artes do espetáculo',
+  'Pescas',
+  'Produção agrícola e animal',
+  'Programas de Agricultura não classificados noutras áreas',
+  'Programas de Artes  não classificados noutras áreas',
+  'Programas de Artes e humanidades não classificados noutras áreas',
+  'Programas de Ciências biológicas e ciências afins não classificados noutras áreas',
+  'Programas de Ciências empresariais e administração não classificados noutras áreas',
+  'Programas de Ciências empresariais, administração e direito não classificados noutras áreas',
+  'Programas de Ciências físicas não classificados noutras áreas',
+  'Programas de Ciências sociais e comportamentais não classificados noutras áreas',
+  'Programas de Ciências sociais, jornalismo e informação não classificados noutras áreas',
+  'Programas de Educação não classificados noutras áreas',
+  'Programas de Educação sem definição precisa',
+  'Programas de Engenharia e tecnologias afins não classificados noutras áreas',
+  'Programas de Engenharia, indústrias transformadoras e construção não classificados noutras áreas',
+  'Programas de Humanidades (exceto línguas) não classificados noutras áreas',
+  'Programas de Indústrias transformadoras não classificados noutras áreas',
+  'Programas de Jornalismo e informação não classificados noutras áreas',
+  'Programas de Línguas não classificados noutras áreas',
+  'Programas de Proteção social não classificados noutras áreas',
+  'Programas de Saúde e proteção social não classificados noutras áreas',
+  'Programas de Saúde não classificados noutras áreas',
+  'Programas de Tecnologias da informação e comunicação (TICs) não classificados noutras áreas',
+  'Programas e qualificações genéricos sem definição precisa',
+  'Programas e qualificações interdisciplinares que envolvem a Educação',
+  'Programas e qualificações interdisciplinares que envolvem a Engenharia, indústrias transformadoras e construção',
+  'Programas e qualificações interdisciplinares que envolvem as Artes e humanidades',
+  'Programas e qualificações interdisciplinares que envolvem as Ciências naturais, matemática e estatística',
+  'Programas e qualificações interdisciplinares que envolvem as Tecnologias da Informação e Comunicação (TICs)',
+  'Proteção social sem definição precisa',
+  'Psicologia',
+  ... 19 more items
 ]
-5: db.contracts.aggregate([{$group:{_id: "$NomeInstituicao", count: {$sum: 1}}}])
+
+4: db.contracts.aggregate([{$group:{_id: {$year: "$DataInicioContrato"}, numero: {$sum: 1}}}, {$sort: {_id: 1}}, {$project: {_id: 0, ano: "$_id", numero: 1}}])
+[
+  { numero: 1310, ano: 2017 },
+  { numero: 2042, ano: 2018 },
+  { numero: 5833, ano: 2019 },
+  { numero: 6293, ano: 2020 },
+  { numero: 2465, ano: 2021 }
+]
+
+5: db.contracts.aggregate([{$group:{_id: "$NomeInstituicao", numero: {$sum: 1}}}, {$project: {_id: 0, nome: "$_id", numero: 1}}])
+Alguns resultados:
+[
+  {
+    numero: 5,
+    nome: 'Instituto de Patologia e Imunologia Molecular da Universidade do Porto (IPATIMUP)'
+  },
+  {
+    numero: 33,
+    nome: 'ISLA - Instituto Politécnico de Gestão e Tecnologia - Escola Superior de Tecnologia'
+  },
+  {
+    numero: 235,
+    nome: 'Instituto Politécnico do Porto - Instituto Superior de Engenharia do Porto'
+  },
+  { numero: 4, nome: 'Montanhas de Investigação' },
+  {
+    numero: 105,
+    nome: 'Universidade Autónoma de Lisboa Luís de Camões'
+  },
+  { numero: 6, nome: 'Universidade de Coimbra - Colégio das Artes' },
+  {
+    numero: 23,
+    nome: 'Universidade de Coimbra - Instituto de Ciências Nucleares Aplicadas à Saúde'
+  },
+  {
+    numero: 31,
+    nome: 'Instituto Politécnico de Bragança - Escola Superior de Comunicação, Administração e Turismo de Mirandela'
+  },
+  {
+    numero: 17,
+    nome: 'Instituto Politécnico de Bragança - Escola Superior de Tecnologia e de Gestão de Bragança'
+  },
+  { numero: 4, nome: 'Instituto Politécnico de Coimbra' },
+  { numero: 2, nome: 'Universidade de Évora' },
+  {
+    numero: 9,
+    nome: 'Escola Superior de Saúde Jean Piaget de Vila Nova de Gaia'
+  },
+  {
+    numero: 7,
+    nome: 'Universidade Católica Portuguesa - Escola Superior Politécnica de Saúde (Lisboa)'
+  },
+  {
+    numero: 366,
+    nome: 'Universidade de Lisboa - Instituto Superior Técnico'
+  },
+  { numero: 23, nome: 'Universidade dos Açores' },
+  {
+    numero: 1,
+    nome: 'Laboratório Colaborativo para a Bioeconomia Azul'
+  },
+  { numero: 1, nome: 'Fundação Gaspar Frutuoso, FP' },
+  {
+    numero: 27,
+    nome: 'Instituto Politécnico de Santarém - Escola Superior de Educação de Santarém'
+  },
+  {
+    numero: 22,
+    nome: 'Universidade Católica Portuguesa - Faculdade de Direito (Porto)'
+  },
+  {
+    numero: 134,
+    nome: 'Universidade Nova de Lisboa - Faculdade de Economia'
+  }
+]
+
 
 1.3:
 Para o id, foi utilizado o _id autogerado do MongoDB. Isto permite manter o ID como um campo único nas inserções.

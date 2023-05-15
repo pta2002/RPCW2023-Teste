@@ -4,7 +4,13 @@ from datetime import datetime
 with open("emprego-cientifico.json") as f:
     data = json.load(f)
     for id, emprego in enumerate(data):
-        if emprego["DataFimContrato"] != "":
+        toDelete = []
+        for k, v in emprego.items():
+            if v == "":
+                toDelete.append(k)
+        for k in toDelete:
+            del emprego[k]
+        if "DataFimContrato" in emprego:
             emprego["DataFimContrato"] = {
                 "$date": {
                     "$numberLong": datetime.strptime(
@@ -13,10 +19,8 @@ with open("emprego-cientifico.json") as f:
                     + "000"
                 }
             }
-        else:
-            emprego["DataFimContrato"] = None
 
-        if emprego["DataInicioContrato"] != "":
+        if "DataInicioContrato" in emprego:
             emprego["DataInicioContrato"] = {
                 "$date": {
                     "$numberLong": datetime.strptime(
@@ -25,7 +29,5 @@ with open("emprego-cientifico.json") as f:
                     + "000"
                 }
             }
-        else:
-            emprego["DataInicioContrato"] = None
     with open("processado.json", "w") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
